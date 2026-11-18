@@ -159,6 +159,7 @@ doc(doc_id="SOP-L3-007", title="Line 3 bolt torque", format="pdf", scope="line:3
         ("1. Purpose", "Torque values and tightening sequence for the flange bolts on Line 3."),
         ("2. Torque values", "Torque for M8 flange bolts on Line 3 is 24 Nm ± 2.\n"
          "Torque for M6 cover bolts on Line 3 is 10 Nm ± 1.\n"
+         "Bolts: M8-FB and M6-CB from Metsun Fasteners, tightened at press station PRS-L3-01.\n"
          "Use the calibrated DC nutrunner only. Hand tools are not allowed for final torque."),
         ("3. Sequence", "Tighten the four M8 flange bolts in a cross pattern in two passes: first pass to 12 Nm, "
          "second pass to final torque."),
@@ -267,8 +268,8 @@ def qdr(no: str, date: str, part: str, supplier: str, machine: str, line: int, f
         ]])
 
 
-qdr("2026-009", "2026-08-07", "BR-310-A", "Metsun Fasteners", "PRS-L3-01", 3,
-    "Undersized M8 bolt threads on BR-310-A bracket kits from Metsun Fasteners, found at press PRS-L3-01 in August 2026.",
+qdr("2026-009", "2026-08-07", "M8-FB (M8 flange bolt)", "Metsun Fasteners", "PRS-L3-01", 3,
+    "Undersized threads on M8 flange bolts (M8-FB) from Metsun Fasteners, found at press PRS-L3-01 in August 2026.",
     "Containment: thread gauge check on all Metsun M8 bolts in stock.",
     "Supplier thread rolling die worn. Metsun replaced the die and submitted an 8D report on 2026-08-19.",
     "Closed 2026-09-02.")
@@ -299,7 +300,7 @@ doc(doc_id="ASL-2026", title="Approved supplier list 2026", format="html", allow
     effective_date="2026-01-01", pages=[[
         ("Approved suppliers", "Supplier | Commodity | Parts | Status | Since\n"
          "Arcflow Castings | Aluminium castings | HX-220-B | Conditional | 2026-08-15\n"
-         "Metsun Fasteners | Fasteners | M8 flange bolts, M6 cover bolts, BR-310-A bolt kits | Approved | 2025-04-01\n"
+         "Metsun Fasteners | Fasteners | M8-FB (M8 flange bolt), M6-CB (M6 cover bolt) | Approved | 2025-04-01\n"
          "Vellore Forge Works | Forgings | BR-310-A | Approved | 2024-11-01\n"
          "Coolkem Lubricants | Coolant and quench oil | CL-8, QO-60 | Approved | 2025-01-10"),
         ("Status notes", "Arcflow Castings has been Conditional since 2026-08-15, after the porosity deviation "
@@ -324,7 +325,7 @@ doc(doc_id="PRC-2026-Q3", title="Supplier price list Q3 2026", format="pdf", all
         ("Prices, Q3 2026", "Part | Supplier | Unit price\n"
          "HX-220-B | Arcflow Castings | Rs 412\n"
          "BR-310-A | Vellore Forge Works | Rs 138\n"
-         "M8 flange bolt | Metsun Fasteners | Rs 6\n"
-         "M6 cover bolt | Metsun Fasteners | Rs 3"),
+         "M8-FB (M8 flange bolt) | Metsun Fasteners | Rs 6\n"
+         "M6-CB (M6 cover bolt) | Metsun Fasteners | Rs 3"),
         ("Note", "HX-220-B unit price is Rs 412. Prices are confidential to the plant head and purchasing."),
     ]])
