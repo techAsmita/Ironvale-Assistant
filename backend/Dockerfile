@@ -6,7 +6,7 @@ RUN useradd -m -u 1000 app
 WORKDIR /app
 COPY backend/requirements.txt backend/requirements.txt
 RUN pip install --no-cache-dir -r backend/requirements.txt \
-    && python -m spacy download en_core_web_sm
+    && pip install --no-cache-dir https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
 ENV HF_HOME=/app/.cache FASTEMBED_CACHE_PATH=/app/.cache/fastembed PORT=8000
 # Bake the CPU models into the image so a cold start does not download them.
 RUN python -c "from fastembed import TextEmbedding; from fastembed.rerank.cross_encoder import TextCrossEncoder; \
