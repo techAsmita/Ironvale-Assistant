@@ -15,6 +15,7 @@ COPY backend backend
 COPY corpus corpus
 COPY db db
 COPY golden.jsonl golden.jsonl
+COPY setup_data.sh setup_data.sh
 RUN chown -R app /app
 USER app
 WORKDIR /app/backend
