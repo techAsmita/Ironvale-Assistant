@@ -1,0 +1,374 @@
+[
+  {
+    "file": "SOP-L1-001.pdf",
+    "doc_id": "SOP-L1-001",
+    "title": "Line 1 CNC changeover",
+    "version": "v1",
+    "effective_date": "2026-04-01",
+    "superseded": false,
+    "allowed_roles": [
+      "line_supervisor",
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:1",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "SOP-L1-002.pdf",
+    "doc_id": "SOP-L1-002",
+    "title": "Line 1 CNC tool offsets",
+    "version": "v1",
+    "effective_date": "2026-04-01",
+    "superseded": false,
+    "allowed_roles": [
+      "line_supervisor",
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:1",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "SOP-L1-003.pdf",
+    "doc_id": "SOP-L1-003",
+    "title": "Line 1 CNC first-article check",
+    "version": "v1",
+    "effective_date": "2026-04-01",
+    "superseded": false,
+    "allowed_roles": [
+      "line_supervisor",
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:1",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "SOP-L1-004.pdf",
+    "doc_id": "SOP-L1-004",
+    "title": "Line 1 CNC coolant top-up",
+    "version": "v1",
+    "effective_date": "2026-05-15",
+    "superseded": false,
+    "allowed_roles": [
+      "line_supervisor",
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:1",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "SOP-L2-011_v3.pdf",
+    "doc_id": "SOP-L2-011",
+    "title": "Furnace loading and soak times",
+    "version": "v3",
+    "effective_date": "2026-07-01",
+    "superseded": false,
+    "allowed_roles": [
+      "line_supervisor",
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:2",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "SOP-L2-011_v2.pdf",
+    "doc_id": "SOP-L2-011",
+    "title": "Furnace loading and soak times",
+    "version": "v2",
+    "effective_date": "2025-11-01",
+    "superseded": true,
+    "allowed_roles": [
+      "line_supervisor",
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:2",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "SOP-L2-012.pdf",
+    "doc_id": "SOP-L2-012",
+    "title": "Quench oil handling",
+    "version": "v1",
+    "effective_date": "2026-02-01",
+    "superseded": false,
+    "allowed_roles": [
+      "line_supervisor",
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:2",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "SOP-L3-005.pdf",
+    "doc_id": "SOP-L3-005",
+    "title": "Line 3 bearing press-fit",
+    "version": "v1",
+    "effective_date": "2026-03-01",
+    "superseded": false,
+    "allowed_roles": [
+      "line_supervisor",
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:3",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "SOP-L3-006.pdf",
+    "doc_id": "SOP-L3-006",
+    "title": "Line 3 leak test",
+    "version": "v1",
+    "effective_date": "2026-03-01",
+    "superseded": false,
+    "allowed_roles": [
+      "line_supervisor",
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:3",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "SOP-L3-007.pdf",
+    "doc_id": "SOP-L3-007",
+    "title": "Line 3 bolt torque",
+    "version": "v1",
+    "effective_date": "2026-03-01",
+    "superseded": false,
+    "allowed_roles": [
+      "line_supervisor",
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:3",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "WI-L3-009.md",
+    "doc_id": "WI-L3-009",
+    "title": "Fixture cleaning note",
+    "version": "v1",
+    "effective_date": "2026-06-10",
+    "superseded": false,
+    "allowed_roles": [
+      "line_supervisor",
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:3",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "MAN-CNC-04.pdf",
+    "doc_id": "MAN-CNC-04",
+    "title": "DMC 850 operator manual, alarm chapter",
+    "version": "v1",
+    "effective_date": "2024-01-15",
+    "superseded": false,
+    "allowed_roles": [
+      "line_supervisor",
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:1",
+    "source": "scanned",
+    "printed_pages": [
+      41,
+      42,
+      43,
+      44,
+      45,
+      46
+    ]
+  },
+  {
+    "file": "MAN-FUR-02.pdf",
+    "doc_id": "MAN-FUR-02",
+    "title": "Batch furnace manual, safety interlocks",
+    "version": "v1",
+    "effective_date": "2023-09-01",
+    "superseded": false,
+    "allowed_roles": [
+      "line_supervisor",
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:2",
+    "source": "scanned",
+    "printed_pages": [
+      17,
+      18,
+      19
+    ]
+  },
+  {
+    "file": "MAN-LT-01.pdf",
+    "doc_id": "MAN-LT-01",
+    "title": "Leak tester manual",
+    "version": "v1",
+    "effective_date": "2024-05-10",
+    "superseded": false,
+    "allowed_roles": [
+      "line_supervisor",
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:3",
+    "source": "digital",
+    "printed_pages": [
+      1,
+      2
+    ]
+  },
+  {
+    "file": "QDR-2026-009.docx",
+    "doc_id": "QDR-2026-009",
+    "title": "Quality deviation report 2026-009",
+    "version": "v1",
+    "effective_date": "2026-08-07",
+    "superseded": false,
+    "allowed_roles": [
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:3",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "QDR-2026-012.docx",
+    "doc_id": "QDR-2026-012",
+    "title": "Quality deviation report 2026-012",
+    "version": "v1",
+    "effective_date": "2026-08-28",
+    "superseded": false,
+    "allowed_roles": [
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:1",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "QDR-2026-014.docx",
+    "doc_id": "QDR-2026-014",
+    "title": "Quality deviation report 2026-014",
+    "version": "v1",
+    "effective_date": "2026-09-16",
+    "superseded": false,
+    "allowed_roles": [
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:1",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "QDR-2026-017.docx",
+    "doc_id": "QDR-2026-017",
+    "title": "Quality deviation report 2026-017",
+    "version": "v1",
+    "effective_date": "2026-09-30",
+    "superseded": false,
+    "allowed_roles": [
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:2",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "QDR-2026-021.docx",
+    "doc_id": "QDR-2026-021",
+    "title": "Quality deviation report 2026-021",
+    "version": "v1",
+    "effective_date": "2026-10-22",
+    "superseded": false,
+    "allowed_roles": [
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "line:3",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "ASL-2026.html",
+    "doc_id": "ASL-2026",
+    "title": "Approved supplier list 2026",
+    "version": "v1",
+    "effective_date": "2026-01-01",
+    "superseded": false,
+    "allowed_roles": [
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "plant",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "SQA-ARC-01.pdf",
+    "doc_id": "SQA-ARC-01",
+    "title": "Supplier quality agreement: Arcflow Castings",
+    "version": "v1",
+    "effective_date": "2025-06-01",
+    "superseded": false,
+    "allowed_roles": [
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "plant",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "SQA-MTS-01.pdf",
+    "doc_id": "SQA-MTS-01",
+    "title": "Supplier quality agreement: Metsun Fasteners",
+    "version": "v1",
+    "effective_date": "2025-04-01",
+    "superseded": false,
+    "allowed_roles": [
+      "quality_engineer",
+      "plant_head"
+    ],
+    "scope": "plant",
+    "source": "digital",
+    "printed_pages": null
+  },
+  {
+    "file": "PRC-2026-Q3.pdf",
+    "doc_id": "PRC-2026-Q3",
+    "title": "Supplier price list Q3 2026",
+    "version": "v1",
+    "effective_date": "2026-07-01",
+    "superseded": false,
+    "allowed_roles": [
+      "plant_head"
+    ],
+    "scope": "plant",
+    "source": "digital",
+    "printed_pages": null
+  }
+]

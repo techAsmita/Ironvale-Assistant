@@ -1,0 +1,75 @@
+# Local stack: docker compose up --build
+# Postgres + pgvector (plant data, chunks, eval runs) · Neo4j (knowledge graph) · Langfuse (traces) · API · web UI
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ironvale
+      POSTGRES_PASSWORD: ironvale
+      POSTGRES_DB: ironvale
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ironvale"]
+      interval: 5s
+      retries: 20
+
+  neo4j:
+    image: neo4j:5-community
+    environment:
+      NEO4J_AUTH: neo4j/ironvale-graph
+    ports: ["7474:7474", "7687:7687"]
+    volumes: [neo4jdata:/data]
+
+  langfuse-db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: langfuse
+      POSTGRES_PASSWORD: langfuse
+      POSTGRES_DB: langfuse
+    volumes: [langfusedata:/var/lib/postgresql/data]
+
+  langfuse:
+    image: langfuse/langfuse:2
+    depends_on: [langfuse-db]
+    environment:
+      DATABASE_URL: postgresql://langfuse:langfuse@langfuse-db:5432/langfuse
+      NEXTAUTH_URL: http://localhost:3001
+      NEXTAUTH_SECRET: local-dev-secret-change-me
+      SALT: local-dev-salt-change-me
+      TELEMETRY_ENABLED: "false"
+      LANGFUSE_INIT_ORG_ID: ironvale
+      LANGFUSE_INIT_PROJECT_ID: ironvale-assistant
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: pk-lf-local-ironvale
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: sk-lf-local-ironvale
+      LANGFUSE_INIT_USER_EMAIL: admin@ironvale.local
+      LANGFUSE_INIT_USER_PASSWORD: ironvale-admin
+    ports: ["3001:3000"]
+
+  api:
+    build: ./backend
+    depends_on:
+      db: {condition: service_healthy}
+      neo4j: {condition: service_started}
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://ironvale:ironvale@db:5432/ironvale
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: ironvale-graph
+      LANGFUSE_HOST: http://langfuse:3000
+      LANGFUSE_PUBLIC_KEY: pk-lf-local-ironvale
+      LANGFUSE_SECRET_KEY: sk-lf-local-ironvale
+    ports: ["8000:8000"]
+
+  web:
+    build: ./frontend
+    depends_on: [api]
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports: ["3000:3000"]
+
+volumes:
+  pgdata:
+  neo4jdata:
+  langfusedata:
