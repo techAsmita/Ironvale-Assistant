@@ -37,11 +37,27 @@ def _langfuse():
     try:
         from langfuse import Langfuse
 
-        _lf = Langfuse(public_key=s.langfuse_public_key, secret_key=s.langfuse_secret_key, host=s.langfuse_host)
+        _lf = Langfuse(public_key=s.langfuse_public_key, secret_key=s.langfuse_secret_key, host=s.langfuse_host,
+                       mask=_mask)
     except Exception as e:  # noqa: BLE001
         log.warning("Langfuse unavailable (%s); tracing locally only", type(e).__name__)
         _lf = None
     return _lf
+
+
+_PRICE = re.compile(r"(?i)\b(?:rs\.?|inr|₹)\s?\d[\d,]*(?:\.\d+)?|unit[_ ]price\S*\s*[:=]?\s*\d+")
+
+
+def _mask(*, data, **_):
+    """Langfuse mask function (runs on this machine before anything is sent): secrets, connection strings and
+    anything that looks like a supplier price. The pipeline never sends restricted text; this is the backstop."""
+    if isinstance(data, str):
+        return _PRICE.sub("[masked]", scrub(data))
+    if isinstance(data, dict):
+        return {k: _mask(data=v) for k, v in data.items()}
+    if isinstance(data, list):
+        return [_mask(data=v) for v in data]
+    return data
 
 
 def scrub(v):

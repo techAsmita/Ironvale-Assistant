@@ -1,0 +1,6 @@
+# Extra packages for the RAGAS scoring in eval/run_eval.py (not needed by the API)
+ragas==0.3.9
+langchain-openai==0.3.35
+langchain-community==0.3.31
+reportlab==5.0.1
+faker==37.12.0

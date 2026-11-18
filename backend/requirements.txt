@@ -1,0 +1,28 @@
+# API
+fastapi==0.162.0
+uvicorn[standard]==0.54.0
+pydantic==2.13.5
+python-dotenv==1.2.3
+httpx==0.28.1
+# Retrieval
+psycopg[binary]==3.3.9
+rank-bm25==0.2.2
+fastembed==0.9.1
+numpy==2.4.6
+# Text-to-SQL and graph
+sqlglot==30.33.0
+neo4j==6.4.1
+# Tracing (v2 SDK: works with self-hosted Langfuse v2 in docker compose and with Langfuse Cloud)
+langfuse==2.60.10
+# Ingest: parsing, week-2 OCR (Tesseract) and masking (Presidio + spaCy)
+pymupdf==2.1
+python-docx==1.2.0
+beautifulsoup4==4.15.0
+pytesseract==0.3.13
+opencv-python-headless==5.0.0.93
+presidio-analyzer==2.2.366
+presidio-anonymizer==2.2.366
+spacy==3.8.18
+tldextract==5.4.0
+# Tests
+pytest==9.1.1
