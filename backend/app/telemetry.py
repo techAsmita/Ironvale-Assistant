@@ -60,6 +60,7 @@ class Trace:
         self.request_id = request_id
         self.spans: list[dict] = []
         self.timings: dict[str, int] = {}
+        self.tokens = {"input": 0, "output": 0}
         self._lf_trace = None
         lf = _langfuse()
         if lf:
@@ -90,6 +91,9 @@ class Trace:
                     pass
 
     def generation(self, name: str, model: str, usage: dict | None, prompt_version: str, **meta):
+        if usage:
+            self.tokens["input"] += int(usage.get("prompt_tokens", 0) or 0)
+            self.tokens["output"] += int(usage.get("completion_tokens", 0) or 0)
         if self._lf_trace and usage:
             try:
                 self._lf_trace.generation(name=name, model=model, metadata={"prompt_version": prompt_version, **scrub(meta)},

@@ -103,7 +103,8 @@ class FakeLLM:
         for block in ("\n\n" + excerpts).split("\n\n[")[1:]:
             n = int(block.split("]", 1)[0])
             header, body = (block.split("\n", 1) + [""])[:2]
-            score = len(qtok & set(tokenize(header + " " + body)))
+            common = qtok & set(tokenize(header + " " + body))
+            score = len(common) + sum(2 for t in common if "-" in t and any(ch.isdigit() for ch in t))
             if best is None or score > best[0]:
                 best = (score, n, body)
         if not best or best[0] < 2:

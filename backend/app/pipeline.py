@@ -19,6 +19,7 @@ from .schemas import (MSG_ERROR, MSG_NOT_FOUND, MSG_OUT_OF_SCOPE, AskRequest, As
                       SqlResult)
 from .telemetry import Trace, new_request_id
 
+_ALARM = re.compile(r"[EFLP]-\d{2,3}")
 _HISTORY_Q = re.compile(r"(?i)\b(before|previous(?:ly)?|earlier|old(?:er)?|history|histor(?:ic|ical)|used to|"
                         r"superseded|changed|change from|v[12]\b|version [12]\b)")
 
@@ -92,6 +93,7 @@ def ask(req: AskRequest, svc: Services) -> AskResponse:
            rewritten_query=resp["rewritten_query"], cited_doc_ids=[c.doc_id for c in resp["citations"]],
            prompt_version=pipe.get("prompt_version"))
     pipe["spans"] = [sp["name"] for sp in tr.spans]
+    pipe["tokens"] = dict(tr.tokens)
     return AskResponse(**resp, pipeline=pipe)
 
 
@@ -116,7 +118,11 @@ def _docs(query: str, user: User, svc: Services, tr: Trace, resp: dict, pipe: di
     pipe["top_rerank_score"] = round(res["top_score"], 3)
     pipe["rerank_threshold"] = s.rerank_threshold
     hits = res["hits"]
-    if not hits or res["top_score"] < s.rerank_threshold:
+    # An exact alarm-code match (E-417, F-30, L-05) in a manual the user may open is strong evidence by itself,
+    # so the threshold does not apply. Part numbers and doc ids still need the re-ranker's score.
+    alarm_hit = any(_ALARM.fullmatch(c) for c in res["codes"]) and bool(hits)
+    pipe["alarm_code_match"] = alarm_hit
+    if not hits or (res["top_score"] < s.rerank_threshold and not alarm_hit):
         resp.update(status="not_found", answer=MSG_NOT_FOUND)
         return
     hits = prefer_current(hits, query)

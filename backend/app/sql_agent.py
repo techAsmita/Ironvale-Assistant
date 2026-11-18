@@ -207,8 +207,9 @@ def summarise(question: str, cols: list[str], rows: list[list], metric_note: str
         top = max(rows, key=lambda r: r[1])
         low = min(rows, key=lambda r: r[1])
         label = cols[1].replace("_", " ")
-        text = (f"{len(rows)} results. Highest {label}: {top[0]} ({_fmt(top[1])}). "
-                f"Lowest: {low[0]} ({_fmt(low[1])}).")
+        what = cols[0].replace("_id", "").replace("_", " ")
+        text = (f"{label.capitalize()} for {len(rows)} {what}{'s' if not what.endswith('s') else ''}. "
+                f"Highest: {top[0]} ({_fmt(top[1])}). Lowest: {low[0]} ({_fmt(low[1])}).")
     else:
         text = f"{len(rows)} rows."
     if metric_note:

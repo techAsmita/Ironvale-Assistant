@@ -432,6 +432,20 @@ def answer_graph(question: str, role: str, line: int | None, store, today: date 
     return {"status": "answered", "template": tpl, "params": params, "rows": rows, **render(tpl, params, rows)}
 
 
+def _day(iso: str) -> str:
+    d = date.fromisoformat(iso)
+    return f"{d.day} {d:%b %Y}"
+
+
+def _period(d0: str, d1: str) -> str:
+    a, b = date.fromisoformat(d0), date.fromisoformat(d1)
+    if a.month == 1 and a.day == 1 and b == date(a.year + 1, 1, 1):
+        return f"in {a.year}"
+    if a.day == 1 and b == date(a.year + (a.month == 12), a.month % 12 + 1, 1):
+        return f"in {a:%B %Y}"
+    return f"from {_day(d0)} to {_day((date.fromordinal(b.toordinal() - 1)).isoformat())}"
+
+
 def render(tpl: str, params: dict, rows: list[dict]) -> dict:
     docs = sorted({d for r in rows for d in r["sources"] if not d.startswith("DB:")})
     n = {d: i for i, d in enumerate(docs, 1)}
@@ -463,9 +477,9 @@ def render(tpl: str, params: dict, rows: list[dict]) -> dict:
             sups[r["supplier"]].append(r)
         parts = []
         for sup, rs in sorted(sups.items()):
-            devs = "; ".join(f"{r['deviation']} ({r['part']} on {r['machine']}, {r['date']}) {cite(r['sources'])}"
+            n_dev = len({r["deviation"] for r in rs})
+            devs = "; ".join(f"{r['deviation']}, {r['part']} on {r['machine']} ({_day(r['date'])}) {cite(r['sources'])}"
                              for r in sorted(rs, key=lambda r: r["date"]))
-            parts.append(f"{sup}: {devs}")
-        answer = (f"Suppliers behind deviations on Line {params['line']} from {params['date_from']} to "
-                  f"{params['date_to']} (exclusive): " + ". ".join(parts) + ".")
+            parts.append(f"{sup} is behind {n_dev} deviation{'s' * (n_dev > 1)}: {devs}")
+        answer = f"On Line {params['line']} {_period(params['date_from'], params['date_to'])}, " + ". ".join(parts) + "."
     return {"answer": answer, "paths": paths, "sources": docs}
