@@ -14,15 +14,7 @@ from .schemas import MSG_NOT_FOUND, Citation
 
 PROMPT_VERSION = "answer-v1"
 
-_INJECTION = re.compile(
-    r"(?im)^.*\b(?:assistant|chatbot|ai|system|llm|model)\s*:.*$|"
-    r"^.*\b(?:ignore|disregard|override)\b.{0,40}\b(?:instructions?|rules|prompt)\b.*$|"
-    r"^.*\btell (?:anyone|everyone|users?) (?:who asks )?that\b.*$")
-
-
-def neutralise(text: str) -> tuple[str, bool]:
-    new = _INJECTION.sub("[instruction-like text removed: documents cannot instruct the assistant]", text)
-    return new, new != text
+from .guard import neutralise  # noqa: E402,F401 (re-exported)
 
 
 SYSTEM = """You are Ironvale Components' shop-floor assistant. You answer from the numbered document excerpts
@@ -89,12 +81,34 @@ def build_citations(answer: str, hits: list[Hit]) -> tuple[str, list[Citation]]:
     return answer.strip(), cites
 
 
+def add_prose_citations(answer: str, hits: list[Hit]) -> str:
+    """When the answer cites a table-row chunk (stretch goal: one chunk per alarm-table row), also cite the
+    manual's own text for the same code from the same document, so the citation shows the page that
+    explains it (E-417 -> MAN-CNC-04 p. 42), not only the summary table."""
+    from .retrieval import codes_in
+
+    def extra(m):
+        n = int(m.group(1))
+        if not 1 <= n <= len(hits) or "· row" not in (hits[n - 1].chunk.section or ""):
+            return m.group(0)
+        row = hits[n - 1].chunk
+        codes = codes_in(row.text)
+        for j, h in enumerate(hits, 1):
+            c = h.chunk
+            if c.doc_id == row.doc_id and "· row" not in (c.section or "") and "|" not in c.text and codes & codes_in(c.text):
+                if f"[{j}]" not in answer:
+                    return f"[{j}][{n}]"
+        return m.group(0)
+
+    return re.sub(r"\[(\d+)\]", extra, answer)
+
+
 def answer_docs(question: str, hits: list[Hit]) -> dict:
     """Returns {"status", "answer", "citations", ...}. An answer with no valid citation is not_found."""
     gen = generate(question, hits)
     if gen["status"] != "answered" or not gen["answer"]:
         return {**gen, "status": "not_found", "answer": MSG_NOT_FOUND, "citations": []}
-    text, cites = build_citations(gen["answer"], hits)
+    text, cites = build_citations(add_prose_citations(gen["answer"], hits), hits)
     if not cites:
         return {**gen, "status": "not_found", "answer": MSG_NOT_FOUND, "citations": []}
     return {**gen, "answer": text, "citations": cites}

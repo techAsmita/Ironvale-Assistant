@@ -53,8 +53,11 @@ class Chunk:
 
     def search_text(self) -> str:
         """What BM25 and the embedder see: the document identity plus the chunk body."""
+        from .guard import neutralise
+
         flag = " (superseded)" if self.superseded else ""
-        return f"{self.doc_id} {self.version}{flag} · {self.title} · {self.section or ''}\n{self.text}"
+        body, _ = neutralise(self.text)
+        return f"{self.doc_id} {self.version}{flag} · {self.title} · {self.section or ''}\n{body}"
 
 
 def tokens(text: str) -> int:
