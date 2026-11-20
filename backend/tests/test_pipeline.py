@@ -125,3 +125,30 @@ def test_api_contract(services, fake_llm):
     prc = next(i for i in services.retriever.by_id if i.startswith("PRC-"))
     assert c.get(f"/v1/chunks/{prc}", params={"user_id": "u_sup_l1"}).status_code == 404
     assert c.get(f"/v1/chunks/{prc}", params={"user_id": "u_head"}).status_code == 200
+
+
+def test_documents_list_only_what_the_role_can_open(services):
+    from app import main
+    main.STATE["svc"] = services
+    sup = {d["doc_id"] for d in main.documents("u_sup_l1")}
+    qe = {d["doc_id"] for d in main.documents("u_qe")}
+    head = {d["doc_id"] for d in main.documents("u_head")}
+    assert "SOP-L1-001" in sup and "MAN-CNC-04" in sup
+    assert not any(d.startswith(("QDR", "ASL", "SQA", "PRC")) for d in sup)
+    assert "QDR-2026-014" in qe and "PRC-2026-Q3" not in qe
+    assert "PRC-2026-Q3" in head
+    man = next(d for d in main.documents("u_sup_l1") if d["doc_id"] == "MAN-CNC-04")
+    assert man["page_range"] == [41, 46] and "-row-" not in man["first_chunk_id"]
+
+
+def test_overview_is_scoped_to_the_user(services):
+    if not TEST_DB:
+        pytest.skip("overview needs TEST_DATABASE_URL")
+    from app import main
+    main.STATE["svc"] = services
+    sup = main.overview("u_sup_l1")
+    assert {m["line"] for m in sup["machines"]} == {1} and sup["defects"] is None
+    head = main.overview("u_head")
+    assert {m["line"] for m in head["machines"]} == {1, 2, 3} and head["defects"]["records"] > 0
+    assert sup["coverage"]["downtime_events"] < head["coverage"]["downtime_events"]
+    assert "unit_price" not in str(sup)

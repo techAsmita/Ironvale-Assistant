@@ -44,3 +44,30 @@ export const getEval = () => fetch(`${API}/v1/eval`).then((r) => j<EvalData>(r))
 export interface EvalRun { run_id: string; created_at: string; git_commit: string; prompt_version: string; model: string;
   metrics: Record<string, any>; }
 export interface EvalData { runs: EvalRun[]; failed: any[]; langfuse_host: string; }
+
+export interface DocInfo {
+  doc_id: string; title: string; version: string | null; effective_date: string | null; superseded: boolean;
+  scope: string; source: "digital" | "scanned"; kind: string; sections: number; first_chunk_id: string;
+  page_range: [number, number] | null;
+}
+export interface Overview {
+  user: { user_id: string; name: string; role: string; line: number | null };
+  coverage: { from: string | null; to: string | null; downtime_events: number };
+  machines: { machine_id: string; line: number; type: string; model: string }[];
+  work_orders: { count: number; yield_pct: number | null };
+  defects: { records: number; qty: number } | null;
+  breakdown_by_month: { month: string; hours: number; events: number }[];
+  downtime_by_category: { category: string; hours: number }[];
+  breakdown_by_machine: { machine_id: string; hours: number; events: number }[];
+  alarms: { alarm_code: string; events: number; hours: number; machines: number }[];
+  recent_breakdowns: { machine_id: string; start_at: string; minutes: number; reason_code: string; alarm_code: string | null }[];
+  yield_by_month: { month: string; yield_pct: number }[];
+  documents: number;
+}
+export interface Health { status: string; startup_error: string | null; chunks: number; llm_model: string;
+  llm_configured: boolean; langfuse: boolean; rerank_threshold: number; }
+
+const q = (id: string) => `user_id=${encodeURIComponent(id)}`;
+export const getDocuments = (user_id: string) => fetch(`${API}/v1/documents?${q(user_id)}`).then((r) => j<DocInfo[]>(r));
+export const getOverview = (user_id: string) => fetch(`${API}/v1/overview?${q(user_id)}`).then((r) => j<Overview>(r));
+export const getHealth = () => fetch(`${API}/health`).then((r) => j<Health>(r));

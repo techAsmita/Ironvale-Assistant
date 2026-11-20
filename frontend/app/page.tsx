@@ -1,197 +1,76 @@
 "use client";
 import Link from "next/link";
-import { FormEvent, useEffect, useRef, useState } from "react";
-import AnswerCard from "@/components/AnswerCard";
+import { Composer, Conversation } from "@/components/Assistant";
 import Icon from "@/components/Icon";
-import { ask, AskResponse, Citation, DemoUser, getChunk, getUsers, Turn } from "@/lib/api";
-import { ACCESS, KIND, Kind, ROLE_LABEL, SUGGESTIONS, THINKING } from "@/lib/people";
+import { greeting, month, num, period } from "@/lib/format";
+import { QUICK, ROLE_LABEL, SUGGESTIONS } from "@/lib/people";
+import { useSession } from "@/lib/session";
 
-type Msg = { kind: "q"; text: string } | { kind: "a"; r: AskResponse } | { kind: "err"; text: string };
-type ChunkView = Awaited<ReturnType<typeof getChunk>>;
-
-const initials = (n: string) => n.split(" ").map((p) => p[0]).slice(0, 2).join("");
-function greeting() {
-  const h = Number(new Date().toLocaleString("en-IN", { hour: "numeric", hour12: false, timeZone: "Asia/Kolkata" }));
-  return h < 5 ? "Working late" : h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
-}
-
-function Thinking() {
-  const [i, setI] = useState(0);
-  useEffect(() => { const t = setInterval(() => setI((x) => Math.min(x + 1, THINKING.length - 1)), 900); return () => clearInterval(t); }, []);
+function Plant() {
+  // Line-art plant skyline; decorative only.
   return (
-    <div className="thinking" role="status" aria-live="polite">
-      {THINKING.map((s, j) => (
-        <div key={s} className={`step ${j < i ? "done" : j === i ? "now" : ""}`}><span className="dot" />{s}</div>
-      ))}
-    </div>
+    <svg className="hero-art" viewBox="0 0 520 220" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round">
+      <path d="M0 200h520" />
+      <path d="M20 200v-70l40 22v-22l40 22v-22l40 22v48" />
+      <path d="M150 200V96h56v104M164 96V40h10v56M186 96V58h9v38" />
+      <path d="M220 200v-64h92v64M232 150h16v14h-16zM260 150h16v14h-16zM288 150h16v14h-16z" />
+      <path d="M330 200V120a24 24 0 0 1 48 0v80M336 132h36M336 150h36M336 168h36" />
+      <path d="M392 200v-46h56v46M404 154v-20h32v20M412 134v-30h16v30" />
+      <path d="M462 200V86h14v114M469 86V64M454 112h30M454 140h30" />
+      <path d="M178 52c6-8 18-10 26-4M190 34c8-10 22-10 30 0" opacity=".55" />
+      <path d="M312 176h18M378 176h14M448 176h14" />
+    </svg>
   );
 }
 
 export default function Home() {
-  const [users, setUsers] = useState<DemoUser[]>([]);
-  const [user, setUser] = useState<DemoUser | null>(null);
-  const [msgs, setMsgs] = useState<Msg[]>([]);
-  const [text, setText] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [down, setDown] = useState(false);
-  const [open, setOpen] = useState<{ c: Citation; chunk: ChunkView | null } | null>(null);
-  const end = useRef<HTMLDivElement>(null);
-  const input = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    getUsers().then((u) => { setUsers(u); setUser(u[0] ?? null); }).catch(() => setDown(true));
-  }, []);
-  useEffect(() => { end.current?.scrollIntoView({ behavior: "smooth", block: "end" }); }, [msgs, busy]);
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(null); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-
-  const history = (): Turn[] =>
-    msgs.flatMap((m): Turn[] => m.kind === "q" ? [{ role: "user", content: m.text }]
-      : m.kind === "a" ? [{ role: "assistant", content: m.r.answer }] : []).slice(-6);
-
-  async function submit(q: string) {
-    if (!user || !q.trim() || busy) return;
-    const h = history();
-    setMsgs((m) => [...m, { kind: "q", text: q.trim() }]);
-    setText(""); setBusy(true);
-    try {
-      const r = await ask(user.user_id, q.trim(), h);
-      setMsgs((m) => [...m, { kind: "a", r }]);
-    } catch {
-      setMsgs((m) => [...m, { kind: "err", text: "Couldn't reach the assistant. Check the connection and try again." }]);
-    } finally { setBusy(false); input.current?.focus(); }
-  }
-
-  function pick(id: string) {
-    const u = users.find((x) => x.user_id === id);
-    if (u) { setUser(u); setMsgs([]); setOpen(null); }
-  }
-
-  async function openCitation(c: Citation) {
-    setOpen({ c, chunk: null });
-    if (c.chunk_id && user) {
-      try { setOpen({ c, chunk: await getChunk(c.chunk_id, user.user_id) }); } catch { /* metadata only */ }
-    }
-  }
-
-  const access = user ? ACCESS[user.role] : null;
+  const { user, msgs, overview, docs, submit, down } = useSession();
+  if (msgs.length > 0) return <Conversation />;
   const first = user?.name.split(" ")[0] ?? "";
-  const suggestions = user ? SUGGESTIONS[user.user_id] ?? [] : [];
-  const byKind = (k: Kind) => suggestions.filter((s) => s.kind === k);
+  const sugg = user ? SUGGESTIONS[user.user_id] ?? [] : [];
+  const lastMonth = overview?.breakdown_by_month.at(-1);
+  const current = docs?.filter((d) => !d.superseded).length;
 
   return (
-    <div className="app">
-      <header className="topbar">
-        <div className="brand">
-          <div className="brand-mark">IV</div>
-          <div><b>Ironvale shop-floor assistant</b><span>Hosur plant · Lines 1–3</span></div>
+    <div className="page home">
+      <section className="hero">
+        <Plant />
+        <div className="hero-text">
+          <h1>{greeting()}{first && <>, <span className="accent">{first}.</span></>}</h1>
+          <p>Your AI shop-floor assistant. Ask about procedures, alarms, plant numbers and suppliers. Every answer cites the document, page and version it came from.</p>
         </div>
-        <div className="spacer" />
-        <span className="pill-dark">Plant data: Aug–Oct 2026</span>
-        <nav className="topnav"><Link className="on" href="/">Assistant</Link><Link href="/eval">Evaluation</Link></nav>
-        <div className="who">
-          <select aria-label="Signed in as" value={user?.user_id ?? ""} onChange={(e) => pick(e.target.value)}>
-            {users.map((u) => <option key={u.user_id} value={u.user_id}>{u.name} · {ROLE_LABEL[u.role]} · {u.scope}</option>)}
-          </select>
+        <Composer big autoFocus />
+        {user && <div className="hero-note"><Icon name="shield" size={15} />Answering as {user.name} · {ROLE_LABEL[user.role]} · {user.scope}. Restricted information is never shown.</div>}
+        {down && <div className="notice"><Icon name="info" size={20} /><p>The assistant is starting up. This page connects automatically.</p></div>}
+      </section>
+
+      <section className="stats" aria-label="Your scope">
+        <div className="stat"><Icon name="book" size={20} /><div><b>{current ?? "–"}</b><span>Documents you can open</span></div></div>
+        <div className="stat"><Icon name="machine" size={20} /><div><b>{overview ? overview.machines.length : "–"}</b><span>Machines in your scope</span></div></div>
+        <div className="stat"><Icon name="clock" size={20} /><div><b>{lastMonth ? `${num(lastMonth.hours)} h` : "–"}</b><span>Breakdown time{lastMonth ? `, ${month(lastMonth.month)}` : ""}</span></div></div>
+        <div className="stat"><Icon name="database" size={20} /><div><b>{overview ? period(overview.coverage.from, overview.coverage.to) : "–"}</b><span>Plant data period</span></div></div>
+      </section>
+
+      <section>
+        <div className="section-head"><h2><Icon name="bolt" size={20} />Quick actions</h2></div>
+        <div className="quick">
+          {QUICK.map((q) => (
+            <Link key={q.href} href={q.href} className="qcard">
+              <span className="qicon"><Icon name={q.icon} size={22} /></span>
+              <b>{q.title}</b><span>{q.text}</span>
+              <span className="qgo"><Icon name="chevron" size={16} /></span>
+            </Link>
+          ))}
         </div>
-      </header>
+      </section>
 
-      <div className="body">
-        <aside className="rail">
-          <section>
-            <h2>Signed in as</h2>
-            <div className="people">
-              {users.map((u) => (
-                <button key={u.user_id} className={`person ${user?.user_id === u.user_id ? "on" : ""}`} onClick={() => pick(u.user_id)}>
-                  <span className="avatar">{initials(u.name)}</span>
-                  <span className="pmeta"><b>{u.name}</b><small>{ROLE_LABEL[u.role] ?? u.role} · {u.scope}</small></span>
-                </button>
-              ))}
-              {down && <span className="muted" style={{ fontSize: 13 }}>The assistant is starting up. Refresh in a minute.</span>}
-            </div>
-          </section>
-          {access && (
-            <section>
-              <h2>What {first} can see</h2>
-              <div className="access">
-                {access.can.map((s) => <div key={s} className="row yes"><Icon name="check" size={16} />{s}</div>)}
-                {access.cannot.map((s) => <div key={s} className="row no"><Icon name="lock" size={16} />{s}</div>)}
-                <small>Anything outside this looks the same as missing. Saying &quot;I&apos;m the plant head&quot; doesn&apos;t change it.</small>
-              </div>
-            </section>
-          )}
-          <section>
-            <h2>Every answer</h2>
-            <div className="access">
-              <div className="row yes"><Icon name="doc" size={16} />Cites the document, page and version</div>
-              <div className="row yes"><Icon name="scan" size={16} />Reads scanned manuals too</div>
-              <div className="row yes"><Icon name="gauge" size={16} />Shows numbers as a chart and table</div>
-            </div>
-          </section>
-        </aside>
-
-        <main className="main">
-          <div className="thread">
-            <div className="column">
-              {msgs.length === 0 && user && (
-                <section className="welcome">
-                  <h1>{greeting()}, {first}.</h1>
-                  <p>Ask about a procedure, an alarm, your line&apos;s numbers or a supplier. Answers come only from documents and data you&apos;re allowed to see, with the source for every fact.</p>
-                  <div className="groups">
-                    {(["docs", "data", "graph"] as Kind[]).filter((k) => byKind(k).length).map((k) => (
-                      <div key={k} className="group">
-                        <div className="group-head"><Icon name={KIND[k].icon} />{KIND[k].label}</div>
-                        <div className="group-hint">{KIND[k].hint}</div>
-                        {byKind(k).map((s) => <button key={s.q} className="suggest" onClick={() => submit(s.q)}>{s.q}</button>)}
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-              {msgs.map((m, i) => m.kind === "q" ? <div key={i} className="q">{m.text}</div>
-                : m.kind === "a" ? <AnswerCard key={i} r={m.r} onOpen={openCitation} />
-                : <div key={i} className="notice error"><Icon name="alert" size={20} /><p>{m.text}</p></div>)}
-              {busy && <Thinking />}
-              <div ref={end} />
-            </div>
+      {sugg.length > 0 && (
+        <section className="suggest-panel">
+          <div className="section-head"><h2><Icon name="bulb" size={20} />Suggested questions for {first}</h2></div>
+          <div className="chips-row">
+            {sugg.map((s) => <button key={s.q} className="chip-q" onClick={() => submit(s.q)}>{s.q}</button>)}
           </div>
-          <div className="composer-wrap">
-            <form className="composer" onSubmit={(e: FormEvent) => { e.preventDefault(); submit(text); }}>
-              <input ref={input} value={text} onChange={(e) => setText(e.target.value)} disabled={!user}
-                placeholder={user ? `Ask as ${first}, e.g. "What does alarm E-417 mean?"` : "Loading…"} aria-label="Your question" />
-              <button className="send" disabled={!user || busy || !text.trim()}><Icon name="send" size={16} /><span>Ask</span></button>
-            </form>
-            {user && <div className="composer-hint"><Icon name="lock" size={13} />Answering as {user.name} · {ROLE_LABEL[user.role]} · {user.scope}</div>}
-          </div>
-        </main>
-      </div>
-
-      {open && (
-        <div className="drawer-bg" onClick={() => setOpen(null)}>
-          <aside className="drawer" onClick={(e) => e.stopPropagation()} aria-label="Source">
-            <div className="drawer-head">
-              <div>
-                <h3>{open.c.doc_id} · {open.c.title}</h3>
-                <div className="m">
-                  {open.c.section && <span className="tag">{open.c.section}</span>}
-                  {open.c.page && <span className="tag page">page {open.c.page}</span>}
-                  {open.c.version && <span className="tag">{open.c.version}</span>}
-                  {open.c.effective_date && <span className="tag">effective {open.c.effective_date}</span>}
-                  {open.c.superseded && <span className="tag old">superseded version</span>}
-                  {open.chunk?.source === "scanned" && <span className="tag scan">scanned manual · read by OCR</span>}
-                </div>
-              </div>
-              <button className="btn-ghost" onClick={() => setOpen(null)}>Close</button>
-            </div>
-            <div className="drawer-body">
-              {open.chunk ? <div className="text">{open.chunk.text}</div> : <p className="muted">Loading the source…</p>}
-              <p className="note">Names of people in documents are replaced with placeholders like &lt;PERSON_1&gt; before indexing.</p>
-            </div>
-          </aside>
-        </div>
+        </section>
       )}
     </div>
   );

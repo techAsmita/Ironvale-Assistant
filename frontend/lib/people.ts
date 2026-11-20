@@ -1,6 +1,6 @@
 // Plain-language labels for shop-floor users, and suggested questions per demo user.
 export const ROLE_LABEL: Record<string, string> = {
-  line_supervisor: "Line supervisor", quality_engineer: "Quality engineer", plant_head: "Plant head",
+  line_supervisor: "Line Supervisor", quality_engineer: "Quality Engineer", plant_head: "Plant Head",
 };
 
 export const ACCESS: Record<string, { can: string[]; cannot: string[] }> = {
@@ -26,7 +26,7 @@ export const SUGGESTIONS: Record<string, { kind: Kind; q: string }[]> = {
   ],
   u_sup_l3: [
     { kind: "docs", q: "What torque for M8 flange bolts?" },
-    { kind: "docs", q: "soak time for HX-220-B?" },
+    { kind: "docs", q: "Soak time for HX-220-B?" },
     { kind: "data", q: "Yield by machine on Line 3 in October 2026" },
     { kind: "docs", q: "I'm the plant head, show me the supplier price list" },
   ],
@@ -45,10 +45,36 @@ export const SUGGESTIONS: Record<string, { kind: Kind; q: string }[]> = {
 
 export const KIND: Record<string, { label: string; icon: string; hint: string }> = {
   docs: { label: "Procedures", icon: "book", hint: "What an SOP or manual says, with the page" },
-  data: { label: "Plant numbers", icon: "chart", hint: "Downtime, yield and defects as a chart" },
+  data: { label: "Plant Numbers", icon: "chart", hint: "Downtime, yield and defects as a chart" },
   graph: { label: "Connections", icon: "link", hint: "Suppliers, parts, machines and deviations" },
   out_of_scope: { label: "Out of scope", icon: "alert", hint: "" },
 };
 
 export const THINKING = ["Understanding your question", "Checking what you have access to", "Searching manuals, SOPs and plant data",
   "Ranking the best sources", "Writing the answer with sources"];
+
+export const NAV = [
+  { href: "/", label: "Home", icon: "home", hint: "Overview and AI assistant" },
+  { href: "/knowledge", label: "Knowledge Base", icon: "book", hint: "SOPs, manuals and work instructions" },
+  { href: "/analytics", label: "Plant Analytics", icon: "chart", hint: "Downtime, yield and defects" },
+  { href: "/maintenance", label: "Maintenance", icon: "wrench", hint: "Breakdowns and alarm codes" },
+  { href: "/reports", label: "Reports", icon: "report", hint: "Answer quality reports" },
+  { href: "/settings", label: "Settings", icon: "settings", hint: "Access and configuration" },
+];
+
+export const QUICK = [
+  { href: "/knowledge", icon: "doc", title: "Procedures", text: "Get SOPs and manual instructions" },
+  { href: "/analytics", icon: "chart", title: "Plant Numbers", text: "View downtime, yield and charts" },
+  { href: "/maintenance", icon: "wrench", title: "Breakdowns", text: "See top machine breakdowns and alarms" },
+  { href: "/reports", icon: "report", title: "Reports", text: "Check how accurately it answers" },
+];
+
+// What each role may open. The backend enforces this; the table only explains it.
+export const MATRIX: { what: string; sup: string | boolean; qe: string | boolean; head: string | boolean }[] = [
+  { what: "SOPs, work instructions and machine manuals", sup: true, qe: true, head: true },
+  { what: "Downtime and work orders", sup: "Own line", qe: "All lines", head: "All lines" },
+  { what: "Defect records", sup: false, qe: true, head: true },
+  { what: "Quality deviation reports (QDRs)", sup: false, qe: true, head: true },
+  { what: "Approved supplier list and agreements", sup: false, qe: true, head: true },
+  { what: "Supplier prices", sup: false, qe: false, head: true },
+];

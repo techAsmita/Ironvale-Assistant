@@ -446,6 +446,11 @@ def _period(d0: str, d1: str) -> str:
     return f"from {_day(d0)} to {_day((date.fromordinal(b.toordinal() - 1)).isoformat())}"
 
 
+def _machine_line(machine: str) -> int | None:
+    m = re.search(r"-L(\d+)-", machine)
+    return int(m.group(1)) if m else None
+
+
 def render(tpl: str, params: dict, rows: list[dict]) -> dict:
     docs = sorted({d for r in rows for d in r["sources"] if not d.startswith("DB:")})
     n = {d: i for i, d in enumerate(docs, 1)}
@@ -454,20 +459,27 @@ def render(tpl: str, params: dict, rows: list[dict]) -> dict:
         paths = [[f"Supplier:{r['supplier']}", "SUPPLIES", f"Part:{r['part']}", "RUNS ON", f"Machine:{r['machine']}"]
                  + ([ "COVERED BY", f"SOP:{r['sop']}"] if r.get("sop") else []) for r in rows]
         by_part = defaultdict(set)
-        sops = defaultdict(set)
         for r in rows:
             by_part[r["part"]].add(r["machine"])
-            if r.get("sop"):
-                sops[r["machine"]].add(r["sop"])
-        lines = [f"If {params['supplier']} is put on hold, these parts and machines are affected:"]
+        lines = []
         for part, machines in sorted(by_part.items()):
-            src = [d for r in rows if r["part"] == part for d in r["sources"]]
-            lines.append(f"{params['supplier']} supplies {part}, which runs on {', '.join(sorted(machines))} "
-                         f"{cite(src)}.")
-        all_sops = sorted({s for ss in sops.values() for s in ss})
+            src = [d for r in rows if r["part"] == part for d in r["sources"] if not d.startswith("SOP-")]
+            per_line = defaultdict(list)
+            for m in sorted(machines):
+                per_line[_machine_line(m)].append(m)
+            where = "; ".join(f"Line {ln}: {', '.join(ms)}" if ln else ", ".join(ms) for ln, ms in sorted(per_line.items(), key=lambda kv: kv[0] or 0))
+            n_lines = len([ln for ln in per_line if ln])
+            lines.append(f"If {params['supplier']} is put on hold, part {part} is affected {cite(src)}. "
+                         f"It runs on {len(machines)} machine{'s' * (len(machines) > 1)}"
+                         f"{f' across {n_lines} lines' if n_lines > 1 else ''} ({where}).")
+        sop_line = defaultdict(set)
+        for r in rows:
+            if r.get("sop"):
+                sop_line[_machine_line(r["machine"])].add(r["sop"])
+        all_sops = sorted({s for ss in sop_line.values() for s in ss})
         if all_sops:
-            src = [r["sop"] for r in rows if r.get("sop")]
-            lines.append(f"SOPs covering those machines: {', '.join(all_sops)} {cite(src)}.")
+            lines.append(f"{len(all_sops)} SOP{'s' * (len(all_sops) > 1)} cover those machines and would need review: "
+                         f"{', '.join(all_sops)}.")
         answer = " ".join(lines)
     else:
         paths = [[f"Supplier:{r['supplier']}", "SUPPLIES", f"Part:{r['part']}", "INVOLVED IN",

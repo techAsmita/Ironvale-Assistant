@@ -30,6 +30,7 @@ def test_deviation_trail_line1_qe(graph_store):
 def test_supplier_exposure_head(graph_store):
     a = answer_graph("If Arcflow is put on hold, which machines and SOPs are affected?", "plant_head", None, graph_store, T)
     assert a["status"] == "answered" and "CNC-L1-04" in a["answer"] and "SOP-L1-001" in a["answer"]
+    assert "10 machines across 3 lines" in a["answer"] and a["answer"].count("[") <= 2  # concise, few inline cites
 
 
 def test_paths_inherit_access(graph_store):

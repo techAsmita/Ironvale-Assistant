@@ -88,14 +88,14 @@ Then open http://localhost:3000. Langfuse is at http://localhost:3001 (`admin@ir
 
 ```bash
 cd backend
-python -m pytest -q                                  # 76 tests, offline (fake LLM, in-memory stores)
+python -m pytest -q                                  # 78 tests, offline (fake LLM, in-memory stores)
 TEST_DATABASE_URL=$DATABASE_URL python -m pytest -q  # + data-route tests against your Postgres
 pip install -r ../eval/requirements.txt
 python ../eval/calibrate.py                          # re-rank threshold from the golden set
 python ../eval/alarm_compare.py                      # BM25 vs dense vs hybrid on alarm questions
-python ../eval/run_eval.py                           # 35 golden questions, RAGAS + leak checks -> Eval page
+python ../eval/run_eval.py                           # 35 golden questions, RAGAS + leak checks -> Reports page
 ```
-`golden.jsonl` has the 10 public questions, 20 of ours, and 5 alarm lookups for the stretch goal. Each run is stored with the git commit and prompt version, shown on the app's **Evaluation** page, and written to `eval/runs/latest.json`.
+`golden.jsonl` has the 10 public questions, 20 of ours, and 5 alarm lookups for the stretch goal. Each run is stored with the git commit and prompt version, shown on the app's **Reports** page, and written to `eval/runs/latest.json`.
 
 **Latest run:** _paste the summary from `eval/runs/latest.json` here after running on real models._
 
