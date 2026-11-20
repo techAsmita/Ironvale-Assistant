@@ -33,9 +33,16 @@ export default function EvalPage() {
     ? `${data.langfuse_host.replace(/\/$/, "")}/trace/${id.slice(3)}` : null;
 
   return (
-    <div className="eval">
-      <nav className="nav" style={{ marginBottom: 12 }}><Link href="/">← Assistant</Link></nav>
-      <h1 style={{ margin: 0 }}>Evaluation</h1>
+    <div className="app">
+      <header className="topbar">
+        <div className="brand"><div className="brand-mark">IV</div>
+          <div><b>Ironvale shop-floor assistant</b><span>Evaluation on the golden question set</span></div></div>
+        <div className="spacer" />
+        <nav className="topnav"><Link href="/">Assistant</Link><Link className="on" href="/eval">Evaluation</Link></nav>
+      </header>
+    <div className="eval"><div className="column">
+      <h1 style={{ margin: "0 0 4px" }}>How well it answers</h1>
+      <p className="muted" style={{ margin: 0 }}>Every run asks all golden questions as the real users, scores them, and is kept here with its git commit and prompt version.</p>
       {err && <p className="thinking">Couldn&apos;t load evaluation runs.</p>}
       {latest && (
         <p className="understood">
@@ -44,7 +51,7 @@ export default function EvalPage() {
         </p>
       )}
       {latest && (
-        <div className="cards">
+        <div className="cards" style={{ marginTop: 16 }}>
           {TARGETS.map((t) => {
             const v = latest.metrics[t.key];
             const good = v === null || v === undefined ? undefined : t.max ? v <= t.target : t.target === 0 ? undefined : v >= t.target;
@@ -64,7 +71,7 @@ export default function EvalPage() {
         </div>
       )}
       {trend.length > 1 && (
-        <div className="panel">
+        <div className="panel" style={{ marginTop: 16 }}>
           <h3 style={{ marginTop: 0 }}>Trend across runs</h3>
           <div style={{ height: 260 }}>
             <ResponsiveContainer>
@@ -82,7 +89,7 @@ export default function EvalPage() {
           </div>
         </div>
       )}
-      <div className="panel">
+      <div className="panel" style={{ marginTop: 16 }}>
         <h3 style={{ marginTop: 0 }}>Failed questions in the latest run</h3>
         {data && data.failed.length === 0 && <p className="thinking">None.</p>}
         {data && data.failed.length > 0 && (
@@ -103,6 +110,7 @@ export default function EvalPage() {
           </table>
         )}
       </div>
+    </div></div>
     </div>
   );
 }

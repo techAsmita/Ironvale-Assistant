@@ -34,7 +34,7 @@ class Settings:
     rerank_model: str
     rerank_threshold: float
     cors_origins: list[str]
-    prompt_version: str = "answer-v1"
+    prompt_version: str = "answer-v2"
 
 
 @lru_cache(maxsize=1)

@@ -69,7 +69,7 @@ def test_golden(services, fake_llm, g):
 def test_spans_named_as_required(services, fake_llm):
     r = run(services, GOLD[0])
     assert {"understand", "retrieve.bm25", "retrieve.dense", "fuse", "rerank", "generate"} <= set(r.pipeline["spans"])
-    assert r.pipeline["trace_id"] and r.pipeline["prompt_version"] == "answer-v1"
+    assert r.pipeline["trace_id"] and r.pipeline["prompt_version"] == "answer-v2"
     assert set(r.pipeline["retrieved"]) == {"bm25", "dense", "fused", "reranked"}
 
 

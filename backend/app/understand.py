@@ -70,6 +70,10 @@ def understand(question: str, history: list[dict]) -> dict:
 _DATA = re.compile(r"(?i)\b(downtime|breakdowns?|changeovers? (?:time|minutes)|work orders?|yield|defect (?:rate|qty|quantity|count)s?|"
                    r"how many|top \d|trend|by machine|by month|per machine|monthly|minutes lost|total)\b")
 _GRAPH = re.compile(r"(?i)\b(on hold|behind (?:the )?deviations|which suppliers|supplier exposure|affected machines)\b")
+_FOLLOW_UP = re.compile(r"(?i)^\s*(and|what about|how about|same for|also|then)\b|\b(it|that|this one|them)\b|^\s*in (january|february|"
+                        r"march|april|may|june|july|august|september|october|november|december)\b")
+_DATA_FOLLOW = re.compile(r"(?i)^\s*(and|what about|how about|same for)\b|^\s*in (january|february|march|april|may|june|july|"
+                          r"august|september|october|november|december|line \d)\b")
 _OOS = re.compile(r"(?i)\b(canteen|menu|weather|cricket|football|movie|joke|holiday|salary|lunch)\b")
 
 
@@ -85,13 +89,15 @@ def fallback(question: str, turns: list[dict]) -> dict:
         route = "docs"
     # Minimal follow-up resolution: carry codes from the previous user turn into a short follow-up.
     prev = next((t["content"] for t in reversed(turns) if t["role"] == "user"), "")
-    if prev and len(q.split()) <= 8:
+    # Only a genuine follow-up borrows from the previous turn ("and in September?", "what about Line 3?",
+    # "can I bypass it?"); a new self-contained question ("What's the unit price of HX-220-B?") does not.
+    if prev and len(q.split()) <= 8 and _FOLLOW_UP.search(q):
         from .retrieval import codes_in
 
         carry = codes_in(prev) - codes_in(q)
         if carry:
             q = f"{q} ({', '.join(sorted(carry))})"
-        if route == "docs" and _DATA.search(prev):
+        if route == "docs" and _DATA.search(prev) and _DATA_FOLLOW.search(q):
             route = "data"
             q = f"{prev} - {q}"
     return {"rewritten_query": q, "route": route, "model": "rules", "ms": 0, "usage": {}}

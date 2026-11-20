@@ -244,7 +244,7 @@ def main():
     metrics["cost_run_inr"] = round(cost_usd * USD_INR, 2)
     commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True, cwd=ROOT).stdout.strip()
     run = {"run_id": f"run-{time.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:4]}", "git_commit": commit,
-           "prompt_version": "answer-v1/sql-v1/graph-v1/understand-v1", "model": s.llm_model, "metrics": metrics,
+           "prompt_version": "answer-v2/sql-v1/graph-v1/understand-v1", "model": s.llm_model, "metrics": metrics,
            "results": [{"id": g["id"], "question": g["question"], "user_id": g["user_id"], **d} for g, r, d in results]}
     out = ROOT / "eval" / "runs"
     out.mkdir(parents=True, exist_ok=True)
